@@ -78,6 +78,7 @@
 1. Handling Missing Data
 2. Label Encoding
 3. Feature Scaling
+4. Split Data
 
 # Handling Missing Data
 - Handle the missing data and fill or delete it using pandas functions like fillna() , dropna()
@@ -142,12 +143,12 @@ print(df)
 3      Delhi             1
 ```
 
-### ✅ Advantages:
+### Advantages:
 
 - Very simple and fast.
 -Creates only one column.
 
-### ❌ Disadvantages:
+### Disadvantages:
 - Introduces a false sense of order (e.g., Mumbai > Delhi > Bangalore).
 - Not suitable for nominal data.
 
@@ -160,7 +161,7 @@ Instead of assigning numbers directly (like Label Encoding), it creates **binary
 
 ---
 
-## 🎯 Example Dataset
+## Example Dataset
 
 Let’s take a simple dataset:
 
@@ -205,13 +206,13 @@ print(df_ohe)
 4         0.0           0.0          1.0
 ```
 
-### ✅ Advantages of One-Hot Encoding
+### Advantages of One-Hot Encoding
 
 - Preserves information without giving false order/priority.
 - Works best for Nominal data (categories without order, e.g., City, Color, Gender).
 - Prevents algorithms from misunderstanding numerical relationships.
 
-### ⚠️ Disadvantages
+### Disadvantages
 
 - Increases the number of features (dimensionality issue).
 - Not efficient for high-cardinality categorical features (e.g., thousands of unique IDs).
@@ -221,6 +222,7 @@ Use One-Hot Encoding when the categorical feature is Nominal (no order).
 Example: City, Gender, Country, Department.
 
 # Whole Summarized Code for boths
+
 ```python
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
@@ -260,3 +262,140 @@ df_dummies_binary = df_dummies.astype(int)
 print("\nPandas get_dummies (Forced Binary 0/1):")
 print(df_dummies_binary)
 ```
+
+# Feature Scaling in Machine Learning
+
+## Introduction
+In Machine Learning, different features can have **different scales**.  
+For example:
+- Age might be in **years** (18, 25, 40)
+- Salary might be in **thousands** (20,000 – 100,000)
+
+If we directly feed such data to ML models, the feature with **larger range** (like salary) will dominate over smaller scale features (like age).  
+
+** Feature Scaling helps to bring all features to the same scale.**
+
+---
+
+## Types of Feature Scaling
+
+### 1. **Standardization (Z-score Normalization)**
+- Formula:  
+  \[
+  z = \frac{x - \mu}{\sigma}
+  \]  
+  where \( \mu \) = mean, \( \sigma \) = standard deviation  
+
+- Transforms data to have:
+  - Mean = 0
+  - Standard Deviation = 1
+
+- Best when data follows **Gaussian distribution** (normal distribution).  
+- Commonly used in **Logistic Regression, SVM, PCA, Neural Networks**.
+
+---
+
+### 2. **Normalization (Min-Max Scaling)**
+- Formula:  
+  \[
+  x' = \frac{x - x_{min}}{x_{max} - x_{min}}
+  \]
+
+- Transforms data to a **fixed range**, usually **[0,1]**.
+- Best when you want to **preserve relationships** but scale data.  
+- Common in **Neural Networks** where inputs are preferred in 0–1.
+
+---
+
+## Python Implementation
+
+```python
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+# Sample Data
+data = {
+    "Age": [18, 25, 40, 60, 80],
+    "Salary": [20000, 50000, 100000, 30000, 80000]
+}
+df = pd.DataFrame(data)
+print("Original Data:")
+print(df)
+
+# -------------------------------
+# 1️⃣ Standardization
+# -------------------------------
+scaler = StandardScaler()
+standardized = scaler.fit_transform(df)
+df_standardized = pd.DataFrame(standardized, columns=df.columns)
+print("\nAfter Standardization (Z-score):")
+print(df_standardized)
+
+# -------------------------------
+# 2️⃣ Normalization (Min-Max)
+# -------------------------------
+minmax = MinMaxScaler()
+normalized = minmax.fit_transform(df)
+df_normalized = pd.DataFrame(normalized, columns=df.columns)
+print("\nAfter Normalization (Min-Max):")
+print(df_normalized)
+
+# When to Use Standardization vs Normalization
+
+Feature Scaling is critical in Machine Learning, but choosing the right method depends on the **algorithm** and **data distribution**.
+
+---
+
+## 1. Standardization (Z-score Scaling)
+- **Formula:**
+  \[
+  z = \frac{x - \mu}{\sigma}
+  \]
+
+- **When to Use?**
+  - Data is **normally distributed** (bell curve).
+  - Algorithms assume data is **centered around 0**.
+  - Less sensitive to **outliers** compared to Min-Max.
+
+- **Example:**
+  Predicting **Diabetes using Logistic Regression**:
+  - Feature 1: Age (18–80)  
+  - Feature 2: Glucose Level (50–250)  
+
+  Logistic Regression assumes mean-centered features, so **Standardization** is preferred.
+
+---
+
+## 2. Normalization (Min-Max Scaling)
+- **Formula:**
+  \[
+  x' = \frac{x - x_{min}}{x_{max} - x_{min}}
+  \]
+
+- **When to Use?**
+  - Data doesn’t follow normal distribution.
+  - Need features in a fixed **[0,1] range**.
+  - Algorithms sensitive to **absolute distances**.
+
+- **Example:**
+  Movie recommendation using **KNN (K-Nearest Neighbors)**:
+  - Feature 1: Age (18–80)  
+  - Feature 2: Rating (1–5)  
+
+  Without scaling, **Age dominates** due to larger range.  
+  ✔️ Normalization ensures equal contribution.
+
+---
+
+## Side-by-Side Comparison
+
+| Algorithm | Preferred Scaling | Why |
+|-----------|------------------|-----|
+| **Logistic Regression** | Standardization | Works better with mean-centered data |
+| **SVM (Support Vector Machine)** | Standardization | Kernel functions depend on variance |
+| **KNN (K-Nearest Neighbors)** | Normalization | Distance calculation (Euclidean) is scale-sensitive |
+| **Neural Networks (Deep Learning)** | Normalization | Inputs in [0,1] or [-1,1] speed up training |
+| **PCA (Principal Component Analysis)** | Standardization | Depends on covariance and variance |
+| **Gradient Descent (Linear Regression, etc.)** | Both | Either improves convergence |
+
+---
