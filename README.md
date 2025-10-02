@@ -339,7 +339,7 @@ normalized = minmax.fit_transform(df)
 df_normalized = pd.DataFrame(normalized, columns=df.columns)
 print("\nAfter Normalization (Min-Max):")
 print(df_normalized)
-
+```
 # When to Use Standardization vs Normalization
 
 Feature Scaling is critical in Machine Learning, but choosing the right method depends on the **algorithm** and **data distribution**.
@@ -398,4 +398,113 @@ Feature Scaling is critical in Machine Learning, but choosing the right method d
 | **PCA (Principal Component Analysis)** | Standardization | Depends on covariance and variance |
 | **Gradient Descent (Linear Regression, etc.)** | Both | Either improves convergence |
 
+--- Rule of Thumb
+
+1. If algorithm depends on distances (KNN, K-Means, Neural Nets) → Use Normalization.
+
+2. If algorithm depends on distributions/variance (SVM, Logistic, PCA) → Use Standardization.
+
+# Train-Test Split in Machine Learning
+
+## Introduction
+Before training a machine learning model, it’s crucial to evaluate how well it performs on **unseen data**.  
+We do this by splitting the dataset into:
+
+- **Training set** → Used to **train the model**  
+- **Testing set** → Used to **evaluate the model** on unseen data
+
+> This prevents **data leakage** and ensures realistic model performance.
+
 ---
+
+## Why Split Data?
+1. To avoid overfitting: Model learns training data too well but fails on new data.  
+2. To measure generalization: Gives a realistic estimate of how your model will perform in production.  
+3. To safely apply preprocessing: Scaling, encoding, or transformations must only be fitted on training data.
+
+---
+
+## Typical Split Ratios
+| Purpose | Common Ratio |
+|---------|-------------|
+| Training | 70–80% |
+| Testing | 20–30% |
+
+> For classification tasks, often use **stratified splitting** to preserve class distribution.
+
+---
+
+## Python Example
+
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+# Sample Data
+data = {
+    "Age": [18, 25, 40, 60, 80],
+    "Salary": [20000, 50000, 100000, 30000, 80000],
+    "Purchased": [0, 1, 0, 0, 1]  # Target variable
+}
+df = pd.DataFrame(data)
+
+# Features and Target
+X = df[["Age", "Salary"]]   # Independent variables
+y = df["Purchased"]         # Target variable
+
+# Split dataset (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print("X_train:\n", X_train)
+print("\nX_test:\n", X_test)
+print("\ny_train:", y_train.tolist())
+print("\ny_test:", y_test.tolist())
+```
+### Sample Output
+```csv
+X_train:
+   Age  Salary
+4   80   80000
+2   40  100000
+0   18   20000
+3   60   30000
+
+X_test:
+   Age  Salary
+1   25   50000
+
+y_train: [1, 0, 0, 0]
+y_test: [1]
+```
+
+### Key Parameters
+
+- test_size: Proportion of dataset to use as test set (e.g., 0.2 → 20%)
+- random_state: Ensures reproducibility of the split
+- stratify: Ensures class distribution is maintained in train/test (important for classification)
+---
+
+### Best Practices
+
+1. Split first, then preprocess: Fit scalers/encoders only on X_train
+
+2. Use stratification for classification tasks with imbalanced classes
+
+3. Set random_state for reproducibility
+
+4. Do not touch X_test before final evaluation
+
+---
+
+Next Step
+
+After splitting, the workflow typically continues as:
+
+1. Fit encoders / scalers on X_train
+2. Transform X_train and X_test using the fitted preprocessors
+3. Train the model on X_train
+4. Evaluate performance on X_test
+
+Note:- Combining Train-Test Split + Scaling + Encoding is the foundation of a safe and robust ML pipeline.
