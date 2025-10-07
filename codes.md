@@ -1,6 +1,7 @@
 # Handling Missing Data
 ```python
 import pandas as pd
+import numpy as np
 df = pd.read_csv(r"dataset1.csv")
 print(df.shape) #give the shape
 print(df.isnull()) #returns true where null
@@ -13,10 +14,74 @@ print(df.notnull().sum().sum())  #give total not null values of whole dataset
 df.drop(columns="PassengerId" , inplace=True) #to drop a column
 df.dropna(inplace=True) #to drop all the null values rows
 df.fillna(10) #to fill 10 in all null values
-df["Gender"].fillna( df["Gender"].mode , inplace=True) 
+df["Gender"].fillna( df["Gender"].mode()[0] , inplace=True) #to fill mode in a column
+df_cleaned = df[df["Age"] >= 0] #to remove negative values
+df["Age] = df["Age"].apply(lambda x: np.nan if x<0 else x) #replace with NaN for negative values
 print(df.select_dtypes(include='object')) #select only those columns where datatype is object
 df.duplicated() #returns true where whole row is duplicate
 df.drop_duplicates() #remove the duplicated row
+
+#IF BELOW GRAPH IS BELL CURVE FILL IT WITH MEAN AND IF IT IS SKEWED FILL IT WIHT MEDIAN.
+import pandas as pd
+df = pd.read_csv(r'dataset1.csv')
+import matplotlib.pyplot as plt
+# AGE distribution plot
+plt.hist(df["Age"].dropna(), bins=20, color='skyblue', edgecolor='black')
+plt.title("Age Distribution")
+plt.xlabel("Age")
+plt.ylabel("Count")
+plt.show()
+# FARE distribution plot
+plt.hist(df["Fare"].dropna(), bins=20, color='orange', edgecolor='black')
+plt.title("Fare Distribution")
+plt.xlabel("Fare")
+plt.ylabel("Count")
+plt.show()
+
+#TO DETECT OUTLIERS
+import seaborn as sns
+import matplotlib.pyplot as plt
+data = [10,20,30,40 , 50 , 60 ,70 ,15000 , 20000]
+sns.boxplot(x=data)
+plt.title("Detecting outliers")
+plt.show()
+
+#TO REMOVE OR CAP OUTLIERS WITH IQR METHOD (FOR SKEWED DATA)
+Q1 = df['value'].quantile(0.25)
+Q3 = df['value'].quantile(0.75)
+IQR = Q3 - Q1
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+# detect boolean mask
+outliers_mask = (df['value'] < lower_bound) | (df['value'] > upper_bound)
+# cap (clip) values to bounds
+df['value_iqr_capped'] = df['value'].clip(lower=lower_bound, upper=upper_bound)
+
+#Z-Score (Bell curve)
+import pandas as pd
+from scipy.stats import zscore
+
+# Dataframe with proper column name
+data = [10, 12, 13, 15, 14, 100, 105]
+df = pd.DataFrame(data, columns=['data'])  # give column name
+
+# Calculate Z-score
+df['z_score'] = zscore(df['data'])
+
+# Threshold
+threshold = 3
+
+# Boolean mask for outliers
+outliers_mask = df['z_score'].abs() > threshold
+
+# Select only outliers
+outliers = df[outliers_mask]
+print("Outliers detected:")
+print(outliers)
+
+lower_bound = df['value'].mean() - (3*df['value].std())
+upper_bound = df['value'].mean() + (3*df['value].std())
 ```
 
 # One-Hot Encoding
