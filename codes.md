@@ -222,6 +222,29 @@ print(pd.DataFrame(mms_output, columns=["Hours" , "Marks"]))
 3    0.8   0.75
 4    1.0   1.00
 ```
+### Robust Scaler
+```python
+import pandas as pd
+from sklearn.preprocessing import RobustScaler
+
+data = [15 , 20 , 30 ,35 ,40]
+
+df = pd.DataFrame(data)
+
+rs = RobustScaler()
+scaled_data = rs.fit_transform(df)
+df_scaled = pd.DataFrame(scaled_data, columns=["Encoded"])
+print(df_scaled)
+```
+**Output**
+```csv
+   Encoded
+0      -1.000000
+1      -0.666667
+2       0.000000
+3       0.333333
+4       0.666667
+```
 # TRAIN_TEST_SPLIT
 ```python
 from sklearn.model_selection import train_test_split
