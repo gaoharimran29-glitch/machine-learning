@@ -86,7 +86,7 @@ upper_bound = df['value'].mean() + (3*df['value].std())
 
 # One-Hot Encoding
 
-## using scikit learn
+## 1. using scikit learn
 ```python
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
@@ -108,7 +108,7 @@ print(pd.DataFrame(encoded , columns=ohe.get_feature_names_out(["City"]) ))
 2           0.0         0.0          0.0        1.0
 3           1.0         0.0          0.0        0.0
 ```
-## using pandas
+## 2. Using pandas
 ```python
 import pandas as pd
 data = {
@@ -270,4 +270,90 @@ Hours
 Testing data
 Hours
 1     20
+```
+# Supervised Learning
+## Regression
+### Linear reression
+### To check linearity in data
+
+```python
+#program to check linearity
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = {
+    "House no." : [1,2,3,4,5,6,7] ,
+    "No. of people lives" : [1,2,3,4,5,6,7]
+}
+
+df = pd.DataFrame(data)
+sns.scatterplot(x='House no.' , y="No. of people lives" , data=df)
+plt.show()
+```
+
+### Codes of Linear Regression
+
+```python
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+data = {
+    "House no." : [1,2,3,4,5,6,7] ,
+    "No. of people lives" : [1,2,3,4,5,6,7]
+}
+
+df = pd.DataFrame(data)
+X = df[["House no."]]
+y = df['No. of people lives']
+X_train , X_test , y_train , y_test = train_test_split(X , y , test_size=0.2 , random_state=42)
+model = LinearRegression()
+model.fit(X_train , y_train)
+
+user = int(input("Enter House no.: "))
+
+y_pred = model.predict([[user]])
+
+print(f"IN HOUSE NO. {user}, {y_pred[0]} no. of peoples live")
+```
+
+### Multiple Linear Regression
+
+```python
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+# Step 1: Create sample data with multiple features
+data = {
+    "House no.": [1, 2, 3, 4, 5, 6, 7],
+    "No. of rooms": [2, 3, 2, 4, 3, 5, 4],
+    "Area (sqft)": [500, 700, 600, 800, 750, 900, 850],
+    "No. of people lives": [2, 3, 3, 4, 4, 5, 5]  # Target
+}
+
+df = pd.DataFrame(data)
+
+# Step 2: Define features (X) and target (y)
+X = df[["House no.", "No. of rooms", "Area (sqft)"]]  # Multiple features
+y = df["No. of people lives"]
+
+# Step 3: Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 4: Train Linear Regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Step 5: Take user input for multiple features
+house_no = int(input("Enter House no.: "))
+num_rooms = int(input("Enter number of rooms: "))
+area = float(input("Enter area in sqft: "))
+
+# Step 6: Predict using user input
+user_input = [[house_no, num_rooms, area]]
+y_pred = model.predict(user_input)
+
+print(f"Predicted number of people living: {y_pred[0]:.0f}")
 ```
