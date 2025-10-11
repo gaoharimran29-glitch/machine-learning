@@ -357,3 +357,105 @@ y_pred = model.predict(user_input)
 
 print(f"Predicted number of people living: {y_pred[0]:.0f}")
 ```
+# Polynomial Regression
+```python
+import pandas as pd
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+# Dataset
+data = {
+    "Rooms": [1, 2, 3, 4, 5, 6],
+    "People": [3, 5, 10, 20, 25, 30]
+}
+
+df = pd.DataFrame(data)
+
+X = df[['Rooms']]
+y = df['People']
+
+# Polynomial Features (degree=2)
+pf = PolynomialFeatures(degree=2)
+X_poly = pf.fit_transform(X)
+
+# Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
+
+# Linear Regression on Polynomial Features
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+
+# Model Score
+print("Model R^2 Score:", lr.score(X_test, y_test))
+
+# --- User Input Prediction ---
+while True:
+    try:
+        user_input = float(input("Enter a value to predict (or type 'exit' to quit): "))
+    except ValueError:
+        print("Exiting...")
+        break
+    
+    # Transform the input to polynomial features
+    user_input_poly = pf.transform([[user_input]])
+    
+    # Predict
+    prediction = lr.predict(user_input_poly)
+    print(f"Predicted Output: {prediction[0]}")
+```
+
+# Ridge , Lasso And ElasticNet Regression
+
+```python
+import numpy as np
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+# Sample Dataset
+X = np.array([[1], [2], [3], [4], [5], [6]])  # Single input
+y = np.array([3, 5, 10, 20, 25, 30])
+
+# Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# --- 1. Linear Regression ---
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+y_pred_lr = lr.predict(X_test)
+print("Linear Regression:")
+print("Coefficients:", lr.coef_)
+print("Intercept:", lr.intercept_)
+print("MSE:", mean_squared_error(y_test, y_pred_lr))
+print()
+
+# --- 2. Ridge Regression ---
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_train, y_train)
+y_pred_ridge = ridge.predict(X_test)
+print("Ridge Regression:")
+print("Coefficients:", ridge.coef_)
+print("Intercept:", ridge.intercept_)
+print("MSE:", mean_squared_error(y_test, y_pred_ridge))
+print()
+
+# --- 3. Lasso Regression ---
+lasso = Lasso(alpha=0.1)
+lasso.fit(X_train, y_train)
+y_pred_lasso = lasso.predict(X_test)
+print("Lasso Regression:")
+print("Coefficients:", lasso.coef_)
+print("Intercept:", lasso.intercept_)
+print("MSE:", mean_squared_error(y_test, y_pred_lasso))
+print()
+
+# --- 4. ElasticNet Regression ---
+elastic = ElasticNet(alpha=0.1, l1_ratio=0.5)
+elastic.fit(X_train, y_train)
+y_pred_elastic = elastic.predict(X_test)
+print("ElasticNet Regression:")
+print("Coefficients:", elastic.coef_)
+print("Intercept:", elastic.intercept_)
+print("MSE:", mean_squared_error(y_test, y_pred_elastic))
+```
